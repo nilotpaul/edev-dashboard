@@ -1,0 +1,38 @@
+{
+  "name": "edev-dashboard",
+  "type": "module",
+  "scripts": {
+    "tailwind-watch": "tailwindcss -i ./src/www/styles/globals.css -o ./public/assets/output.css --watch",
+    "tsx-watch": "tsx watch src/index.ts",
+    "dev": "concurrently \"pnpm tailwind-watch\" \"pnpm tsx-watch\"",
+    "build": "node ./esbuild.config.js && tailwindcss -i ./src/www/styles/globals.css -o ./public/assets/output.css && copyfiles -u 1 public/**/* dist/public",
+    "start": "node ./dist/index.cjs"
+  },
+  "dependencies": {
+    "@hono/node-server": "^1.12.0",
+    "bcryptjs": "^2.4.3",
+    "clsx": "^2.1.1",
+    "dotenv": "^16.4.5",
+    "hono": "^4.5.3",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.5.2",
+    "preline": "^2.4.1",
+    "tailwind-merge": "^2.4.0",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@tailwindcss/forms": "^0.5.7",
+    "@types/bcryptjs": "^2.4.6",
+    "@types/jsonwebtoken": "^9.0.6",
+    "@types/node": "^20.14.13",
+    "concurrently": "^8.2.2",
+    "copyfiles": "^2.4.1",
+    "daisyui": "^4.12.10",
+    "esbuild": "^0.23.0",
+    "prettier": "^3.3.3",
+    "prettier-plugin-tailwindcss": "^0.6.5",
+    "tailwindcss": "^3.4.7",
+    "tsx": "^4.16.5",
+    "typed-htmx": "^0.3.1"
+  }
+}
