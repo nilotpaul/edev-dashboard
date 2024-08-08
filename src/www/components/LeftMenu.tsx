@@ -82,7 +82,8 @@ const LeftMenu = ({ children, ...props }: PropsWithChildren & { class?: string }
               <a
                 class='flex items-center gap-x-3.5 rounded-lg bg-gray-100 px-2.5 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:bg-neutral-700 dark:text-white'
                 href='/content'
-                hx-boost='true'
+                // Don't use boost here as doing this wont load any required scripts.
+                // hx-boost='true'
               >
                 <svg
                   class='size-4'

@@ -16,6 +16,7 @@ const LoginForm = ({ error, successMessage }: Props = {}) => {
       class='space-y-4'
       hx-post='/api/v1/user/login'
       hx-target='this'
+      hx-swap='outerHTML'
       hx-indicator='#login-form-loader'
     >
       <h1 class='mx-auto w-full pb-2 text-center text-2xl font-bold text-black dark:text-white'>

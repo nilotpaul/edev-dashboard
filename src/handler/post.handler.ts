@@ -1,7 +1,7 @@
 import { Context } from 'hono';
 import { formDataToObject } from '../utils';
 import { createPostValidation } from '../validations/post.validation';
-import { createPostResponse } from '../www/pages/Content';
+import { CreatePostResponse } from '../www/pages/Content';
 
 export const createPostHandler = async (c: Context) => {
   const formData = await c.req.formData();
@@ -19,7 +19,7 @@ export const createPostHandler = async (c: Context) => {
   if (!success || !parsedData) {
     c.set('err', error?.message);
     return c.html(
-      createPostResponse({
+      CreatePostResponse({
         error,
       })
     );
@@ -29,8 +29,8 @@ export const createPostHandler = async (c: Context) => {
 
   c.set('err', undefined);
   return c.html(
-    createPostResponse({
-      successMessage: 'Post created',
+    CreatePostResponse({
+      success: true,
     })
   );
 };

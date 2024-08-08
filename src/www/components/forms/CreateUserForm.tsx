@@ -14,6 +14,7 @@ const CreateUserForm = ({ error, successMessage }: Props) => {
     <form
       hx-post='/api/v1/user/create'
       hx-target='this'
+      hx-swap='outerHTML'
       hx-indicator='#create-user-form-loader'
       class='mt-6 max-w-md space-y-4'
     >
