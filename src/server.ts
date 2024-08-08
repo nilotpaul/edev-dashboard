@@ -7,17 +7,20 @@ import { apiRoutes } from './routes/apiRoutes';
 import { pagesRoutes } from './routes/pagesRoutes';
 import { errorHandler } from './handler/error.handler';
 import { registerStaticMiddlewares } from './middleware/static.middleware';
+import { sessionMiddleware } from './middleware/auth.middleware';
 
 const createServer = () => {
   const app = new Hono();
   app.use(logger());
-  app.use(
-    cors({
-      origin: ['http://localhost:8000'],
-      allowMethods: ['GET', 'POST', 'PUT', 'DELETE'],
-      credentials: true,
-    })
-  );
+
+  // Cors is not an issue anymore, as there's no seperate client.
+  // app.use(
+  //   cors({
+  //     origin: ['http://localhost:8000'],
+  //     allowMethods: ['GET', 'POST', 'PUT', 'DELETE'],
+  //     credentials: true,
+  //   })
+  // );
   app.use(csrf());
   connectDB();
 
@@ -27,6 +30,9 @@ const createServer = () => {
 
   // Error handler to catch errors thrown by API Handlers.
   app.onError(errorHandler);
+
+  // Middleware that'll add the current session data in context.
+  app.use(sessionMiddleware);
 
   // All routes registered under here will be Pages routes.
   app.route('/', pagesRoutes);

@@ -7,21 +7,13 @@ export const withSuperuserMiddleware = (routeType: 'page' | 'api') => {
     const session = c.get('session') as Session | null;
 
     if (routeType === 'page') {
-      if (!session) {
-        return c.redirect('/');
-      }
-
-      if (session.type !== 'superuser') {
+      if (!session || session.role !== 'superuser') {
         return c.redirect('/');
       }
 
       return next();
     } else {
-      if (!session) {
-        throw new HTTPException(401, { message: 'Unauthorized' });
-      }
-
-      if (session.type !== 'superuser') {
+      if (!session || session.role !== 'superuser') {
         throw new HTTPException(401, { message: 'Unauthorized' });
       }
 

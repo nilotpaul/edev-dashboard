@@ -12,7 +12,12 @@ const LoginForm = ({ error, successMessage }: Props = {}) => {
   const err = error && typeof error !== 'string' ? error.flatten().fieldErrors : null;
 
   return (
-    <form class='space-y-4' hx-post='/api/v1/user/login' hx-target='this'>
+    <form
+      class='space-y-4'
+      hx-post='/api/v1/user/login'
+      hx-target='this'
+      hx-indicator='#login-form-loader'
+    >
       <h1 class='mx-auto w-full pb-2 text-center text-2xl font-bold text-black dark:text-white'>
         Login to EDev Dashboard
       </h1>
@@ -65,9 +70,17 @@ const LoginForm = ({ error, successMessage }: Props = {}) => {
 
       <button
         type='submit'
-        class='mx-auto inline-flex w-full items-center justify-center gap-x-2 rounded-lg border border-transparent bg-gray-800 px-4 py-3 text-center text-sm font-medium text-white hover:bg-gray-900 focus:bg-gray-900 focus:outline-none disabled:pointer-events-none disabled:opacity-50 dark:bg-white dark:text-neutral-800'
+        class='mx-auto inline-flex w-full items-center justify-center gap-2 gap-x-2 rounded-lg border border-transparent bg-gray-800 px-4 py-3 text-center text-sm font-medium text-white hover:bg-gray-900 focus:bg-gray-900 focus:outline-none disabled:pointer-events-none disabled:opacity-50 dark:bg-white dark:text-neutral-800'
       >
         Login
+        <div
+          id='login-form-loader'
+          class='htmx-indicator inline-block size-4 animate-spin rounded-full border-[3px] border-current border-t-transparent text-blue-600 dark:text-blue-500'
+          role='status'
+          aria-label='loading'
+        >
+          <span class='sr-only'>Loading...</span>
+        </div>
       </button>
 
       {error && typeof error === 'string' ? <p class='text-red-500'>{error}</p> : null}

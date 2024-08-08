@@ -2,7 +2,7 @@ import { Context, Next } from 'hono';
 import { env } from '../validations/env';
 import { HTTPException } from 'hono/http-exception';
 import { getSessionCookie, verifyAccessToken } from '../utils/auth';
-import { IUser } from '../../types';
+import { HandlerType } from '../config/app.config';
 import { Session, sessionPayloadSchema } from '../validations/user.validation';
 import User from '../models/User';
 
@@ -27,41 +27,79 @@ export const authorizeMiddleware = async (c: Context, next: Next) => {
   await next();
 };
 
-// withSessionMiddleware will block and redirect the request to /login
-// if it doesn't have a valid session.
-export const withSessionMiddleware = async (c: Context, next: Next) => {
+export const sessionMiddleware = async (c: Context, next: Next) => {
   const token = getSessionCookie(c);
   const decodedUser = verifyAccessToken(token ?? '');
 
-  const { success, data: parsedUser } = sessionPayloadSchema
-    .passthrough()
-    .safeParse(decodedUser.decoded);
+  const {
+    success,
+    data: parsedUser,
+    error,
+  } = sessionPayloadSchema.passthrough().safeParse(decodedUser.decoded);
 
-  if (!success || !parsedUser) {
+  if (!success || !parsedUser || !decodedUser.valid) {
+    console.error('Invalid cookie data', error?.flatten().fieldErrors);
+
     c.set('session', null);
-    return c.redirect('/login');
+    return next();
   }
 
   const dbUser = await User.findOne({ accessToken: token });
 
-  if (!dbUser?.id) {
+  if (!dbUser?._id) {
     c.set('session', null);
-    return c.redirect('/login');
+    return next();
   }
 
   c.set('session', parsedUser);
-  console.log('current session:', parsedUser.id);
+  console.log('current session:', parsedUser._id);
 
   return next();
 };
 
+// withSessionMiddleware will block and redirect the request to /login
+// if it doesn't have a valid session.
+export const withSessionMiddleware = (routeType: HandlerType) => {
+  return (c: Context, next: Next) => {
+    if (routeType === 'page') {
+      const session = c.get('session') as Session | null;
+
+      if (!session?._id) {
+        return c.redirect('/login');
+      }
+
+      return next();
+    } else {
+      const session = c.get('session') as Session | null;
+
+      if (!session?._id) {
+        throw new HTTPException(401, { message: 'Unauthorized' });
+      }
+
+      return next();
+    }
+  };
+};
+
 // withSessionMiddleware will block any requests, if it has a valid session.
-export const withoutSessionMiddleware = async (c: Context, next: Next) => {
-  const session = c.get('session') as Session | null;
+export const withoutSessionMiddleware = (routeType: HandlerType) => {
+  return (c: Context, next: Next) => {
+    if (routeType === 'page') {
+      const session = c.get('session') as Session | null;
 
-  if (session) {
-    throw new HTTPException(401, { message: 'Session is still valid' });
-  }
+      if (session?._id) {
+        return c.redirect('/');
+      }
 
-  return next();
+      return next();
+    } else {
+      const session = c.get('session') as Session | null;
+
+      if (session?._id) {
+        throw new HTTPException(401, { message: 'Session is still valid' });
+      }
+
+      return next();
+    }
+  };
 };

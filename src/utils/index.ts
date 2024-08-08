@@ -20,7 +20,8 @@ export const makeHandler = (handler: Handler<any, any, any, Promise<Response>>) 
   return async (c: Context, next: Next) => {
     const res = await handler(c, next);
 
-    if (res.status !== 200) {
+    const err = c.get('err');
+    if (err) {
       console.error(
         `HTTP ERROR with status: ${res.status}, err: ${c.get('err')} and path: ${c.req.path}`
       );

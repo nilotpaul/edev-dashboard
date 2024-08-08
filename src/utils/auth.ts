@@ -20,7 +20,7 @@ export const comparePassword = async (
   return bcrypt.compare(enteredPassword, storedPassword);
 };
 
-export const signAccessToken = (payload: Pick<IUser, 'id' | 'username' | 'email' | 'type'>) => {
+export const signAccessToken = (payload: Pick<IUser, '_id' | 'username' | 'email' | 'role'>) => {
   return jwt.sign(payload, env.JWT_SECRET, accessTokenConfig);
 };
 

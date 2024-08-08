@@ -1,1 +1,1 @@
-export const USER_TYPE = ['superuser', 'admin'] as const;
+export const USER_ROLE = ['superuser', 'admin'] as const;

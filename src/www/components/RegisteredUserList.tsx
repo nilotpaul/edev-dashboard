@@ -1,8 +1,9 @@
 import { User } from '../../../types';
+import { Session } from '../../validations/user.validation';
 import { getSession } from './context/SessionContext';
 
 const RegisteredUserList = ({ users }: { users: User[] }) => {
-  const session = getSession();
+  const session = getSession() as Session;
 
   return (
     <div class='mt-6 flex flex-col'>
@@ -40,7 +41,7 @@ const RegisteredUserList = ({ users }: { users: User[] }) => {
               </thead>
               <tbody class='divide-y divide-gray-200 dark:divide-neutral-700'>
                 {users.map((user, idx) => (
-                  <tr key={`${user.id}-${idx}`}>
+                  <tr key={`${user._id}-${idx}`}>
                     <td class='whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-800 dark:text-neutral-200'>
                       {user.username}
                     </td>
@@ -48,15 +49,22 @@ const RegisteredUserList = ({ users }: { users: User[] }) => {
                       {user.email}
                     </td>
                     <td class='whitespace-nowrap px-6 py-4 text-sm text-gray-800 dark:text-neutral-200'>
-                      {user.type}
+                      {user.role}
                     </td>
                     <td class='whitespace-nowrap px-6 py-4 text-end text-sm font-medium'>
                       <button
-                        hx-delete={`/api/v1/user/delete?userId=${user.id}`}
+                        hx-delete={`/api/v1/user/delete?userId=${user._id}`}
                         hx-swap='delete'
                         hx-target='closest tr'
-                        hx-disable={user.id === session?.id ? true : undefined}
-                        disabled={user.id === session?.id}
+                        hx-confirm={`Are you sure you want to delete user ${user.username}. This action cannot be undone.`}
+                        hx-disable={
+                          user.role === 'superuser' || String(user._id) === String(session._id)
+                            ? true
+                            : undefined
+                        }
+                        disabled={
+                          user.role === 'superuser' || String(user._id) === String(session._id)
+                        }
                         type='button'
                         class='inline-flex items-center gap-x-2 rounded-lg border border-transparent text-sm font-semibold text-red-600 hover:text-red-800 focus:text-red-800 focus:outline-none disabled:pointer-events-none disabled:opacity-50 dark:text-red-500 dark:hover:text-red-400 dark:focus:text-red-400'
                       >

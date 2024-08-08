@@ -1,12 +1,12 @@
 import { Document } from 'mongoose';
-import { USER_TYPE } from '../src/config/user';
+import { USER_ROLE } from '../src/config/user';
 
 export interface IUser extends Document {
   username: string;
   email: string;
   password: string;
-  type: (typeof USER_TYPE)[number];
+  role: (typeof USER_ROLE)[number];
   accessToken?: string;
 }
 
-export type User = Pick<IUser, 'email' | 'type' | 'username' | 'id'>;
+export type User = Pick<IUser, 'email' | 'role' | 'username' | '_id'>;

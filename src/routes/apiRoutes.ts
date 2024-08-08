@@ -12,6 +12,8 @@ import {
 } from '../middleware/auth.middleware';
 import { makeHandler as h } from '../utils';
 import { withSuperuserMiddleware } from '../middleware/user.middleware';
+import { fetchLinkHandler } from '../handler/editor.handler';
+import { createPostHandler } from '../handler/post.handler';
 
 // makeHandler or h is a wrapper function that will log errors.
 // All the handlers should be wrapped with makeHandler or h utility function.
@@ -28,17 +30,24 @@ apiRoutes.use(authorizeMiddleware);
 // Routes having withSuperuserMiddleware will block any requests if the
 // user role isn't a superuser.
 
+// Users Routes
 apiRoutes.post(
   '/user/create',
-  withSessionMiddleware,
+  withSessionMiddleware('api'),
   withSuperuserMiddleware('api'),
   h(createUserHandler)
 );
 apiRoutes.delete(
   '/user/delete',
-  withSessionMiddleware,
+  withSessionMiddleware('api'),
   withSuperuserMiddleware('api'),
   h(deleteUserHandler)
 );
-apiRoutes.post('/user/login', withoutSessionMiddleware, h(loginHandler));
-apiRoutes.post('/user/logout', withSessionMiddleware, h(logoutHandler));
+apiRoutes.post('/user/login', withoutSessionMiddleware('api'), h(loginHandler));
+apiRoutes.post('/user/logout', withSessionMiddleware('api'), h(logoutHandler));
+
+// Posts Routes
+apiRoutes.post('/posts/create', withSessionMiddleware('api'), h(createPostHandler));
+
+// Editor Routes
+apiRoutes.get('/fetchUrl', withSessionMiddleware('api'), h(fetchLinkHandler));

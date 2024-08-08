@@ -35,7 +35,7 @@ export const createUserHandler = async (c: Context) => {
   ]);
 
   // If username is not available
-  if (usernameTaken?.id) {
+  if (usernameTaken?._id) {
     c.set('err', 'Username is taken');
     return c.html(
       CreateUserForm({
@@ -45,7 +45,7 @@ export const createUserHandler = async (c: Context) => {
   }
 
   // If user exists in the database
-  if (existingUser?.id) {
+  if (existingUser?._id) {
     c.set('err', 'User already exists');
     return c.html(
       CreateUserForm({
@@ -76,6 +76,8 @@ export const createUserHandler = async (c: Context) => {
     );
   }
 
+  c.res.headers.append('HX-Refresh', 'true');
+
   c.set('err', undefined);
   return c.html(
     CreateUserForm({
@@ -88,21 +90,25 @@ export const deleteUserHandler = async (c: Context) => {
   const session = c.get('session') as Session;
   const userId = c.req.query('userId');
 
-  if (!userId || userId?.length === 0) {
+  if (!userId || typeof userId !== 'string' || userId?.length === 0) {
     throw new HTTPException(400, { message: 'Invalid user id' });
   }
 
   const dbUser = await User.findById(userId);
 
-  if (!dbUser?.id) {
+  if (!dbUser?._id) {
     throw new HTTPException(404, { message: 'No user found' });
   }
 
-  if (dbUser.id === session.id) {
+  if (dbUser.role === 'superuser' || session.role !== 'superuser') {
+    throw new HTTPException(401, { message: "You don't have permission to perform this action" });
+  }
+
+  if (String(dbUser._id) === String(session._id)) {
     throw new HTTPException(401, { message: 'You cannot delete your own account' });
   }
 
-  const deletedUser = await User.deleteOne({ id: userId });
+  const deletedUser = await User.deleteOne({ _id: userId });
 
   if (deletedUser?.deletedCount === 0) {
     throw new HTTPException(500, { message: 'Failed to delete user' });
@@ -128,7 +134,7 @@ export const loginHandler = async (c: Context) => {
 
   const dbUser = await User.findOne({ email: parsedBody.email });
 
-  if (!dbUser?.id) {
+  if (!dbUser?._id) {
     c.set('err', "User doesn't exist");
     return c.html(
       LoginIn({
@@ -147,10 +153,10 @@ export const loginHandler = async (c: Context) => {
   }
 
   const token = signAccessToken({
-    id: dbUser.id,
+    _id: dbUser._id,
     username: dbUser.username,
     email: dbUser.email,
-    type: dbUser.type,
+    role: dbUser.role,
   });
 
   if (!token) {
@@ -162,10 +168,11 @@ export const loginHandler = async (c: Context) => {
     );
   }
 
-  const updatedUser = await User.updateOne({ id: dbUser.id }, { accessToken: token });
+  // TODO: check why here only _id works but not id
+  const updatedUser = await User.updateOne({ _id: dbUser._id }, { accessToken: token });
 
   if (!updatedUser || updatedUser.modifiedCount === 0) {
-    c.set('err', 'Failed for some reason. Try again later');
+    c.set('err', `modifiedCount: ${updatedUser.modifiedCount} upsertId: ${updatedUser.upsertedId}`);
     return c.html(
       LoginIn({
         error: 'Failed for some reason. Try again later',

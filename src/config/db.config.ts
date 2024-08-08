@@ -8,7 +8,7 @@ const connectDB = async () => {
   } catch (err) {
     console.error(`Mongoose connection error`);
 
-    throw new Error(`Mongoose connection error: ${err}`);
+    throw err;
   }
 };
 

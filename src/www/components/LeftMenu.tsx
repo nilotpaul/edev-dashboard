@@ -5,7 +5,7 @@ import { getSession } from './context/SessionContext';
 import { Session } from '../../validations/user.validation';
 
 const LeftMenu = ({ children, ...props }: PropsWithChildren & { class?: string }) => {
-  const { type } = getSession() as Session;
+  const session = getSession() as Session;
 
   return (
     <>
@@ -51,7 +51,7 @@ const LeftMenu = ({ children, ...props }: PropsWithChildren & { class?: string }
           data-hs-accordion-always-open
         >
           <ul class='h-full space-y-1.5'>
-            {type === 'superuser' && (
+            {session.role === 'superuser' && (
               <li>
                 <a
                   class='flex items-center gap-x-3.5 rounded-lg bg-gray-100 px-2.5 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:bg-neutral-700 dark:text-white'
@@ -81,6 +81,30 @@ const LeftMenu = ({ children, ...props }: PropsWithChildren & { class?: string }
             <li>
               <a
                 class='flex items-center gap-x-3.5 rounded-lg bg-gray-100 px-2.5 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:bg-neutral-700 dark:text-white'
+                href='/content'
+                hx-boost='true'
+              >
+                <svg
+                  class='size-4'
+                  xmlns='http://www.w3.org/2000/svg'
+                  width='24'
+                  height='24'
+                  viewBox='0 0 24 24'
+                  fill='none'
+                  stroke='currentColor'
+                  stroke-width='2'
+                  stroke-linecap='round'
+                  stroke-linejoin='round'
+                >
+                  <path d='m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z' />
+                  <polyline points='9 22 9 12 15 12 15 22' />
+                </svg>
+                Content
+              </a>
+            </li>
+            <li>
+              <a
+                class='flex items-center gap-x-3.5 rounded-lg bg-gray-100 px-2.5 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:bg-neutral-700 dark:text-white'
                 href='/posts'
                 hx-boost='true'
               >
@@ -105,6 +129,8 @@ const LeftMenu = ({ children, ...props }: PropsWithChildren & { class?: string }
 
             <li class='pt-6'>
               <button
+                hx-post='/api/v1/user/logout'
+                hx-swap='none'
                 type='button'
                 class='inline-flex w-full items-center justify-center gap-x-2 rounded-lg border border-gray-200 bg-white px-4 py-3 text-sm font-medium text-gray-800 shadow-sm hover:bg-gray-50 focus:bg-gray-50 focus:outline-none disabled:pointer-events-none disabled:opacity-50 dark:border-neutral-700 dark:bg-neutral-800 dark:text-white dark:hover:bg-neutral-700 dark:focus:bg-neutral-700'
               >

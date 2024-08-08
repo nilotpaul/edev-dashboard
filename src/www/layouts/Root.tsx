@@ -6,8 +6,8 @@ import LeftMenu from '../components/LeftMenu';
 import { SessionContextProvider } from '../components/context/SessionContext';
 import { Session } from '../../validations/user.validation';
 import Header from '../components/Header';
-import Brand from '../components/Brand';
 import { Icons } from '../components/Icons';
+import { textareaAutoResize } from '../../../scripts/custom/textarea-auto-size';
 
 type PropsInIndexMode = {
   children?: Child;
@@ -34,6 +34,7 @@ const RootLayout: FC<Props> = ({ children, index = true, session }) => {
 
         <script src='https://cdnjs.cloudflare.com/ajax/libs/htmx/2.0.1/htmx.min.js'></script>
         <script src='https://cdn.jsdelivr.net/npm/preline/dist/preline.min.js'></script>
+        <script src='https://cdn.jsdelivr.net/npm/autosize@6.0.1/dist/autosize.min.js'></script>
 
         {getInitialThemeScript()}
         {html`
@@ -57,7 +58,7 @@ const RootLayout: FC<Props> = ({ children, index = true, session }) => {
           </script>
         `}
       </head>
-      <body class='w-full dark:bg-[#171717]'>
+      <body class='w-full text-black dark:bg-[#171717] dark:text-white'>
         {index && session ? (
           <SessionContextProvider session={session}>
             <div class='flex gap-8'>
@@ -78,6 +79,8 @@ const RootLayout: FC<Props> = ({ children, index = true, session }) => {
           <main class='min-h-screen w-full max-w-full px-6 antialiased'>{children}</main>
         )}
       </body>
+
+      {textareaAutoResize()}
     </html>
   );
 };

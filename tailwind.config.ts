@@ -4,5 +4,9 @@ export default {
   content: ['./src/www/**/*.{html,js,jsx,ts,tsx,md,mdx}', 'node_modules/preline/dist/*.js'],
   darkMode: 'class',
   theme: {},
-  plugins: [require('preline/plugin'), require('@tailwindcss/forms')],
+  plugins: [
+    require('preline/plugin'),
+    require('@tailwindcss/forms'),
+    require('@tailwindcss/typography'),
+  ],
 } satisfies Config;
